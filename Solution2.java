@@ -18,28 +18,38 @@
  */
 class Solution2 {
     public String removeDuplicateLetters(String s) {
-        boolean[] vis = new boolean[25];
-        int[] num = new int[25];
+        boolean[] vis = new boolean[26];
+        int[] num = new int[26];
         for (int i = 0; i < s.length(); i++) {
-            num[s.charAt(i) - ' ']++;
+            num[s.charAt(i) - 'a']++;
         }
 
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < s.length()+1; i++) {
+        // 遍历字符串
+        for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
-            if (!vis[ch - ' ']) {
-                while (sb.length() > 0 && sb.charAt(sb.length() - 1) > ch) {
-                    if (num[sb.charAt(sb.length() - 1) - 'a'] > 0) {
-                        vis[sb.charAt(sb.length() - 1) - 'a'] = false;
-                        sb.deleteCharAt(sb.length() - 1);
-                    } else {
-                        break;
-                    }
-                }
-                vis[ch - 'a'] = true;
-                sb.append(ch);
+            // 每遍历一个字符，减去它的数量
+            num[ch - 'a']--;
+
+            // 如果字符已经在结果中，跳过
+            if (vis[ch - 'a']) {
+                continue;
             }
-            num[ch - 'a'] += 1;
+
+            // 贪心算法，保持字典序最小
+            while (sb.length() > 0 && sb.charAt(sb.length() - 1) > ch) {
+                // 如果栈顶元素后面还会出现，则可以弹出
+                if (num[sb.charAt(sb.length() - 1) - 'a'] > 0) {
+                    vis[sb.charAt(sb.length() - 1) - 'a'] = false;  // 标记为不在栈中
+                    sb.deleteCharAt(sb.length() - 1);  // 弹出栈顶元素
+                } else {
+                    break;  // 如果栈顶元素不会再出现，直接退出
+                }
+            }
+
+            // 将当前字符入栈并标记
+            sb.append(ch);
+            vis[ch - 'a'] = true;
         }
         return sb.toString();
     }
